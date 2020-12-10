@@ -1,0 +1,1 @@
+SELECT * FROM employee INNER JOIN roles on employee.role_id = roles.id;
