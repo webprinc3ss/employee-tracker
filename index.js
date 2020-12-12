@@ -1,160 +1,83 @@
-const mysql = require("mysql2");
+const mysql = require("mysql2/promise");
 const util = require('util');
 const inquirer = require("inquirer");
 var figlet = require('figlet');
-const cTable = require('console.table');
+require('console.table');
 
-const connection = mysql.createConnection({
-    host: "localhost",
-    port: 3306,
-    user: "root", //connecting to DataBase
-    password: "Kitt3n$!",
-    database: "employee_db"
-});
-// IF (connection) start program
-connection.connect(err => {
-    if (err) throw err;
+(async () => {
+    const connection = await mysql.createConnection({
+        host: "localhost",
+        port: 3306,
+        user: "root", //connecting to DataBase
+        password: "Kitt3n$!",
+        database: "employee_db"
+    })
     console.log('connected as id ' + connection.threadId + '\n');
-    init();
-});
+    console.log(figlet.textSync('Evil Inc. Employee Tracker'))
+    let shouldExit = false;
+    while (!shouldExit) {
+        const { action } = await getNextAction();
+        if (action) {
+            await action(connection);
+        } else { shouldExit = true }
 
-connection.query = util.promisify(connection.query);
+    }
+    connection.end();
+})()
 
-init = () => {
-    figlet('Evil Inc. Employee Tracker', function (err, data) {
-        if (err) {
-            console.log('Something went wrong...');
-            console.dir(err);
-            return;
-        }
-        console.log(data)
-        mainMenu();
-    });
-}
 
 // Show All options thru Inquirer
-function mainMenu() {
-    inquirer.prompt([
+function getNextAction() {
+    return inquirer.prompt([
         {
             type: 'list',
-            name: 'selectOptions',
+            name: 'action',
             message: 'What would you like to do?',
             choices: [
-                'View all the Departments',
-                'Department Budgets',
-                'Add a Department',
-                'Delete a Department',
-                'View all the Roles',
-                'Add a Role',
-                'Delete a Role',
-                'View all Employees',
-                'Add an Employee',
-                'Delete an Employee',
-                'Update an Employee role',
-                'Update an Employee managers name',
-                'Show Employee by Department',
-                'Quit'
+                { name: 'View all the Departments', value: showDepartments },
+                { name: 'View all the Roles', value: showRoles },
+                { name: 'View all Employees', value: showEmployees },
+                { name: 'Show Employee by Department', value: () => { } },
+                { name: 'Add a Department', value: addDepartment },
+                { name: 'Add a Role', value: addRole },
+                { name: 'Add an Employee', value: addEmployee },
+                { name: 'Update an Employee role', value: () => { } },
+                { name: 'Update an Employee managers name', value: () => { } },
+                { name: 'Delete a Department', value: deleteDepartment },
+                { name: 'Delete a Role', value: deleteRole },
+                { name: 'Delete an Employee', value: deleteEmployee },
+                { name: 'Department Budgets', value: () => { } },
+                { name: 'Quit', value: false }
             ]
         }
-    ]).then(options => {
-        switch (options.selectOptions) {
-            case 'View all the Departments':
-                showDepartments();
-                break;
-            case 'Department Budgets':
-                showBudgets();
-                break;
-            case 'Add a Department':
-                addDepartment();
-                break;
-            case 'Delete a Department':
-                deleteDepartment();
-                break;
-            case 'View all the Roles':
-                showRoles();
-                break;
-            case 'Add a Role':
-                addRole();
-                break;
-            case 'Delete a Role':
-                deleteRole();
-                break;
-            case 'View all Employees':
-                showEmployees();
-                break;
-            case 'Add an Employee':
-                addEmployee();
-                break;
-            case 'Delete an Employee':
-                deleteEmployee();
-                break;
-            case 'Update an Employee role':
-                updateRole();
-                break;
-            case 'Update an Employee managers name':
-                updateManager()
-                break;
-            case 'Show Employee by Department':
-                showEmployeebyDept();
-                break;
-            default:
-                connection.end();
-        }
-    });
+    ])
+
 }
 
 
 // show all departments
-function showDepartments() {
+const showDepartments = async (connection) => {
     //sql consult select
-    connection.query(`SELECT * FROM department`, (err, res) => {
-        if (err) throw err;
-
-        if (res.length > 0) {
-            console.log('\n')
-            console.log(' ** Departments **')
-            console.log('\n')
-            console.table(res);
-        }
-        //callback the mainMenu
-        mainMenu();
-    });
+    const [res] = await connection.query(`SELECT * FROM department`);
+    if (res.length > 0) {
+        console.log('\n')
+        console.log(' ** Departments **')
+        console.table(res);
+    }
 }
-// show department budgets
-function showDepartments() {
-    //sql consult select
-    connection.query(`SELECT * FROM department`, (err, res) => {
-        if (err) throw err;
 
-        if (res.length > 0) {
-            console.log('\n')
-            console.log(' ** Departments **')
-            console.log('\n')
-            console.table(res);
-        }
-        //callback the mainMenu
-        mainMenu();
-    });
-}
 // show all the role info 
-function showRoles() {
-    connection.query(`SELECT role.title AS job_title,role.id,department.name AS department_name,role.salary  FROM  role LEFT JOIN department ON role.department_id=department.id`,
-        (err, res) => {
+async function showRoles(connection) {
 
-            if (err) throw err;
-
-            if (res.length > 0) {
-                console.log('\n')
-                console.log(' ** Roles **')
-                console.log('\n')
-                console.table(res);
-            }
-            //callback the mainMenu
-            mainMenu();
-        });
+    const [res] = await connection.query(`SELECT role.title AS job_title,role.id,department.name AS department_name,role.salary  FROM  role LEFT JOIN department ON role.department_id=department.id`);
+    if (res.length > 0) {
+        console.log('\n')
+        console.log(' ** Roles **')
+        console.table(res);
+    }
 }
 // show all the employee info
-function showEmployees() {
+function showEmployees(connection) {
     //query consult select
     connection.query(`SELECT employee.id AS "ID", employee.first_name AS 'First Name', employee.last_name AS 'Last Name', role.title AS 'Title', role.salary AS 'Salary', employee.manager_id AS 'Manager ID', department.name AS 'Department'
     FROM employee
@@ -171,13 +94,13 @@ function showEmployees() {
             console.table(res);
         }
         //Call mainMenu
-        mainMenu();
+        getNextAction();
     });
 
 }
 
 //select first name, last name  and id from employee table and back a object array
-async function helperEmpManager() {
+async function helperEmpManager(connection) {
     let res = await connection.query(`SELECT CONCAT(employee.first_name," " ,employee.last_name) AS fullName, employee.id FROM employee`)
     let employeeName = [];
     res.forEach(emp => {
@@ -190,7 +113,7 @@ async function helperEmpManager() {
 }
 
 //select all from department table and back a object array (department name and id)
-async function helperArray() {
+async function helperArray(connection) {
     let res = await connection.query(`SELECT * FROM department `)
     let deptChoice = [];
 
@@ -204,7 +127,7 @@ async function helperArray() {
 }
 
 //select title and  id from role table and back a object array
-async function helperEmployee() {
+async function helperEmployee(connection) {
     let res = await connection.query(`SELECT role.title,role.id FROM role `)
     let roleChoice = [];
 
@@ -219,7 +142,7 @@ async function helperEmployee() {
 
 
 //add a department to the datebase
-function addDepartment() {
+function addDepartment(connection) {
     inquirer.prompt([
         {
             type: 'input',
@@ -245,13 +168,13 @@ function addDepartment() {
                 console.log(nameDepartment + ' Department added!\n');
 
                 //call the mainMenu for show a question again
-                mainMenu();
+                getNextAction();
             })
         })
 }
 
 //Delete department
-async function deleteDepartment() {
+async function deleteDepartment(connection) {
     //return a list department names
     let roleNames = await helperArray();
     inquirer.prompt([
@@ -271,13 +194,13 @@ async function deleteDepartment() {
                 if (err) throw err;
 
                 console.log('Department deleted!\n');
-                mainMenu();
+                getNextAction();
             })
         })
 }
 
 // add role info
-async function addRole() {
+async function addRole(connection) {
     //the function back a array with all the departments name
     let deptChoiceRes = await helperArray();
 
@@ -325,13 +248,13 @@ async function addRole() {
             connection.query('INSERT INTO role SET title=?,salary=?,department_id=? ', [title, salary, id], (err, res) => {
                 if (err) throw err;
                 console.log(title + ' Role added!\n');
-                mainMenu();
+                getNextAction();
             })
         })
 }
 
 // delete a role from the table 
-async function deleteRole() {
+async function deleteRole(connection) {
     let rolesName = await helperEmployee();
     inquirer.prompt([
 
@@ -350,13 +273,13 @@ async function deleteRole() {
                 if (err) throw err;
 
                 console.log(res.affectedRows + 'A role was delete!\n');
-                mainMenu();
+                getNextAction();
             })
         })
 }
 
 //add an employee to the date base
-async function addEmployee() {
+async function addEmployee(connection) {
     let employeeNames = await helperEmpManager();
     let rolesName = await helperEmployee();
 
@@ -423,13 +346,13 @@ async function addEmployee() {
             connection.query('INSERT INTO employee SET first_name=?,last_name=?,role_id=?,manager_id=? ', [name, last, roleIdEmp, managerId], (err, res) => {
                 if (err) throw err;
                 console.log(' Employee ' + name + " added!");
-                mainMenu();
+                getNextAction();
             })
         })
 }
 
 //delete an employee info from a table used a id
-async function deleteEmployee() {
+async function deleteEmployee(connection) {
 
     let employees = await helperEmpManager();
     inquirer.prompt([
@@ -450,13 +373,13 @@ async function deleteEmployee() {
                 if (err) throw err;
 
                 console.log(res.affectedRows + ' Employee deleted!\n');
-                mainMenu();
+                getNextAction();
             })
         })
 }
 
 //update employee role
-async function updateRole() {
+async function updateRole(connection) {
     //call the functions back an employee names,id and roles names,id
     let employeeNames = await helperEmpManager();
     let rolesName = await helperEmployee();
@@ -489,13 +412,13 @@ async function updateRole() {
                 console.log(res.affectedRows + ' Employee updated role changed!\n');
 
                 //call the mainMenu for show a question again
-                mainMenu();
+                getNextAction();
             })
         })
 };
 
 
-async function updateManager() {
+async function updateManager(connection) {
     let namesEmpManager = await helperEmpManager();
 
     inquirer.prompt([
@@ -526,13 +449,13 @@ async function updateManager() {
                 console.log(res.affectedRows + ' Employee updated manager changed!\n');
 
                 //call the mainMenu for show a question again
-                mainMenu();
+                getNextAction();
             })
         })
 }
 
 //show employees by department
-async function showEmployeebyDept() {
+async function showEmployeebyDept(connection) {
     //return a list department names
     let deptnames = await helperArray();
 
@@ -565,7 +488,7 @@ async function showEmployeebyDept() {
                     console.log('\n')
                     console.log('There are no employees in that department now')
                 }
-                mainMenu();
+                getNextAction();
             })
         })
 }
