@@ -104,7 +104,5 @@ dist
 .tern-port
 
 # Old code
-index2.js
-db/schema_old.sql
-db/seeds2.sql
+old_code
 
