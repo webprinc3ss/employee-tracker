@@ -2,26 +2,27 @@ use employee_db;
 
 INSERT INTO department (name)
 VALUES
-('Human Resources'),
-('Sales'),
-('On Air'),
-('IT');
+('The Lair'),
+('Security'),
+('Onsite Lab'),
+('Sales and Marketing'),
+('Design and Development');
 
 
  INSERT INTO role (title , salary , department_id )
 VALUES
 
-('Sales Manager',55000,2),
-('Web Guru',48000,4),
-('Part-time host',32000,3),
-('IT Manager',55000,4),
-('HR admin',28000,1);
+('Evil Mastermind',55000,1),
+('Evil Robot Designer',72000,5),
+('Test Subject',12000,5),
+('Henchman',55000,1),
+('Scam Manager',28000,4);
 
  INSERT INTO employee (first_name, last_name, role_id ,manager_id) 
 VALUES
- ('Mariyn','Monroe',2,NULL),
- ('Abraham','Lincoln',2,1),
- ('Pika','Chu',1,NULL),
+ ('Bond','James Bond',2,NULL),
+ ('Number','Two',4,Null),
+ ('Pika','Chu',3,NULL),
  ('Grogu','Yoda',3,NULL),
- ('Bruce','Lee',4,NULL);
+ ('Boba','Fett',4,2);
 

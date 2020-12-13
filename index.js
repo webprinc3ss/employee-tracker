@@ -105,7 +105,7 @@ function mainMenu() {
 
 
 // show all departments
-function showDepartments() {
+showDepartments = () => {
     //sql consult select
     connection.query(`SELECT * FROM department`, (err, res) => {
         if (err) throw err;
@@ -121,7 +121,7 @@ function showDepartments() {
 }
 
 // show all the role info 
-function showRoles() {
+showRoles = () => {
     connection.query(`SELECT role.title AS job_title,role.id,department.name AS department_name,role.salary  FROM  role LEFT JOIN department ON role.department_id=department.id`,
         (err, res) => {
 
@@ -138,7 +138,7 @@ function showRoles() {
         });
 }
 // show all the employee info
-function showEmployees() {
+showEmployees = () => {
     //query consult select
     connection.query(`SELECT employee.id AS "ID", employee.first_name AS 'First Name', employee.last_name AS 'Last Name', role.title AS 'Title', role.salary AS 'Salary', employee.manager_id AS 'Manager ID', department.name AS 'Department'
     FROM employee
@@ -161,7 +161,7 @@ function showEmployees() {
 }
 
 //select first name, last name  and id from employee table and back a object array
-async function helperEmpManager() {
+const helperEmpManager = async () => {
     let res = await connection.query(`SELECT CONCAT(employee.first_name," " ,employee.last_name) AS fullName, employee.id FROM employee`)
     let employeeName = [];
     res.forEach(emp => {
@@ -174,7 +174,7 @@ async function helperEmpManager() {
 }
 
 //select all from department table and back a object array (department name and id)
-async function helperArray() {
+const helperArray = async () => {
     let res = await connection.query(`SELECT * FROM department `)
     let deptChoice = [];
 
@@ -188,7 +188,7 @@ async function helperArray() {
 }
 
 //select title and  id from role table and back a object array
-async function helperEmployee() {
+const helperEmployee = async () => {
     let res = await connection.query(`SELECT role.title,role.id FROM role `)
     let roleChoice = [];
 
@@ -203,7 +203,7 @@ async function helperEmployee() {
 
 
 //add a department to the datebase
-function addDepartment() {
+const addDepartment = async () => {
     inquirer.prompt([
         {
             type: 'input',
@@ -235,7 +235,7 @@ function addDepartment() {
 }
 
 //Delete department
-async function deleteDepartment() {
+const deleteDepartment = async () => {
     //return a list department names
     let roleNames = await helperArray();
     inquirer.prompt([
@@ -261,7 +261,7 @@ async function deleteDepartment() {
 }
 
 // add role info
-async function addRole() {
+const addRole = async () => {
     //the function back a array with all the departments name
     let deptChoiceRes = await helperArray();
 
@@ -315,7 +315,7 @@ async function addRole() {
 }
 
 // delete a role from the table 
-async function deleteRole() {
+const deleteRole = async () => {
     let rolesName = await helperEmployee();
     inquirer.prompt([
 
@@ -340,7 +340,7 @@ async function deleteRole() {
 }
 
 //add an employee to the date base
-async function addEmployee() {
+const addEmployee = async () => {
     let employeeNames = await helperEmpManager();
     let rolesName = await helperEmployee();
 
@@ -413,7 +413,7 @@ async function addEmployee() {
 }
 
 //delete an employee info from a table used a id
-async function deleteEmployee() {
+const deleteEmployee = async () => {
 
     let employees = await helperEmpManager();
     inquirer.prompt([
@@ -433,14 +433,14 @@ async function deleteEmployee() {
             connection.query('DELETE FROM employee WHERE id=? ', [deleteId], (err, res) => {
                 if (err) throw err;
 
-                console.log(res.affectedRows + ' Employee deleted!\n');
+                console.log('Employee deleted!\n');
                 mainMenu();
             })
         })
 }
 
 //update employee role
-async function updateRole() {
+const updateRole = async () => {
     //call the functions back an employee names,id and roles names,id
     let employeeNames = await helperEmpManager();
     let rolesName = await helperEmployee();
@@ -470,7 +470,7 @@ async function updateRole() {
                 if (err) throw err;
 
 
-                console.log(res.affectedRows + ' Employee updated role changed!\n');
+                console.log(' Employee updated role changed!\n');
 
                 //call the mainMenu for show a question again
                 mainMenu();
@@ -479,7 +479,7 @@ async function updateRole() {
 };
 
 
-async function updateManager() {
+const updateManager = async () => {
     let namesEmpManager = await helperEmpManager();
 
     inquirer.prompt([
@@ -487,7 +487,7 @@ async function updateManager() {
         {   //show a list with array employee names   
             type: 'list',
             name: 'employee',
-            message: 'Choose an employee to update his/her',
+            message: 'Choose an employee to update his/her manager',
             choices: namesEmpManager
 
         },
@@ -507,7 +507,7 @@ async function updateManager() {
                 if (err) throw err;
 
 
-                console.log(res.affectedRows + ' Employee updated manager changed!\n');
+                console.log("Employee's manager has been updated!");
 
                 //call the mainMenu for show a question again
                 mainMenu();
@@ -516,7 +516,7 @@ async function updateManager() {
 }
 
 //show employees by department
-async function showEmployeebyDept() {
+const showEmployeebyDept = async () => {
     //return a list department names
     let deptnames = await helperArray();
 
@@ -539,15 +539,14 @@ async function showEmployeebyDept() {
 
                     console.log('\n')
                     console.log('** Employees by Department **')
-                    console.log('\n')
                     console.table(res);
                 }
                 else {
                     //if no employees
                     console.log('\n')
                     console.log('** Employees by Department **')
-                    console.log('\n')
                     console.log('There are no employees in that department now')
+                    console.log('\n')
                 }
                 mainMenu();
             })
