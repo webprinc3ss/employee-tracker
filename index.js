@@ -41,7 +41,7 @@ function mainMenu() {
             message: 'What would you like to do?',
             choices: [
                 'View all the Departments',
-                'Show Employee by Department',
+                'Show Employees by Department',
                 'Add a Department',
                 'Delete a Department',
                 new inquirer.Separator(),
@@ -94,7 +94,7 @@ function mainMenu() {
             case `Update an Employee's manager`:
                 updateManager()
                 break;
-            case 'Show Employee by Department':
+            case 'Show Employees by Department':
                 showEmployeebyDept();
                 break;
             default:
@@ -114,6 +114,7 @@ showDepartments = () => {
             console.log('\n')
             console.log(' ** Departments **')
             console.table(res);
+
         }
         //callback the mainMenu
         mainMenu();
@@ -132,6 +133,7 @@ showRoles = () => {
                 console.log(' ** Roles **')
                 console.log('\n')
                 console.table(res);
+
             }
             //callback the mainMenu
             mainMenu();
@@ -153,6 +155,7 @@ showEmployees = () => {
             console.log('** Employees **')
             console.log('\n')
             console.table(res);
+
         }
         //Call mainMenu
         mainMenu();
@@ -225,8 +228,8 @@ const addDepartment = async () => {
             connection.query('INSERT INTO department SET name=? ', [nameDepartment], (err, res) => {
                 if (err) throw err;
 
-                //print the info tell the user 1 department was inserted
                 console.log(nameDepartment + ' Department added!\n');
+                console.log('\n');
 
                 //call the mainMenu for show a question again
                 mainMenu();
@@ -255,6 +258,7 @@ const deleteDepartment = async () => {
                 if (err) throw err;
 
                 console.log('Department deleted!\n');
+                console.log('\n');
                 mainMenu();
             })
         })
@@ -334,6 +338,7 @@ const deleteRole = async () => {
                 if (err) throw err;
 
                 console.log('The ' + answers.roleDelete + 'was deleted!\n');
+                console.log('\n');
                 mainMenu();
             })
         })
@@ -434,6 +439,7 @@ const deleteEmployee = async () => {
                 if (err) throw err;
 
                 console.log('Employee deleted!\n');
+                console.log('\n')
                 mainMenu();
             })
         })
@@ -471,6 +477,7 @@ const updateRole = async () => {
 
 
                 console.log(' Employee updated role changed!\n');
+                console.log('\n')
 
                 //call the mainMenu for show a question again
                 mainMenu();
@@ -508,6 +515,7 @@ const updateManager = async () => {
 
 
                 console.log("Employee's manager has been updated!");
+                console.log('\n')
 
                 //call the mainMenu for show a question again
                 mainMenu();
