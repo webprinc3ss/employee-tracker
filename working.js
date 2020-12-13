@@ -52,11 +52,9 @@ function mainMenu() {
                 'View all Employees',
                 'Add an Employee',
                 'Delete an Employee',
-                `Update an Employee's role`,
-                `Update an Employee's manager`,
-                new inquirer.Separator(),
-                'Quit',
-                new inquirer.Separator(),
+                'Update an Employee role',
+                'Update an Employee managers name',
+                'Quit'
             ]
         }
     ]).then(options => {
@@ -88,10 +86,10 @@ function mainMenu() {
             case 'Delete an Employee':
                 deleteEmployee();
                 break;
-            case `Update an Employee's role`:
+            case 'Update an Employee role':
                 updateRole();
                 break;
-            case `Update an Employee's manager`:
+            case 'Update an Employee managers name':
                 updateManager()
                 break;
             case 'Show Employee by Department':
@@ -333,7 +331,7 @@ async function deleteRole() {
             connection.query('DELETE FROM role WHERE id=? ', [deleteId], (err, res) => {
                 if (err) throw err;
 
-                console.log('The ' + answers.roleDelete + 'was deleted!\n');
+                console.log(res.affectedRows + 'A role was delete!\n');
                 mainMenu();
             })
         })
