@@ -1,14 +1,14 @@
 const mysql = require("mysql2");
 const util = require('util');
 const inquirer = require("inquirer");
-var figlet = require('figlet');
-const cTable = require('console.table');
+const figlet = require('figlet');
+require('console.table');
 
 const connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
     user: "root", //connecting to DataBase
-    password: "Kitt3n$!",
+    password: "",
     database: "employee_db"
 });
 // IF (connection) start program
@@ -21,15 +21,15 @@ connection.connect(err => {
 connection.query = util.promisify(connection.query);
 
 init = () => {
-    figlet('Evil Inc. Employee Tracker', function (err, data) {
-        if (err) {
-            console.log('Something went wrong...');
-            console.dir(err);
-            return;
-        }
-        console.log(data)
-        mainMenu();
-    });
+    console.log(figlet.textSync('Evil Inc. Employee Tracker'))
+    console.log("-------------------------------------------------------")
+    console.log("AS AN evil business owner")
+    console.log("I WANT to be able to view and manage the departments, ")
+    console.log("roles, and employees in my evil empire")
+    console.log("SO THAT I can organize and plan taking over the world!")
+    console.log("-------------------------------------------------------")
+    console.log('\n')
+    mainMenu();
 }
 
 // Show All options thru Inquirer
@@ -131,7 +131,6 @@ showRoles = () => {
             if (res.length > 0) {
                 console.log('\n')
                 console.log(' ** Roles **')
-                console.log('\n')
                 console.table(res);
 
             }
@@ -153,7 +152,6 @@ showEmployees = () => {
         if (res.length > 0) {
             console.log('\n')
             console.log('** Employees **')
-            console.log('\n')
             console.table(res);
 
         }
@@ -350,7 +348,6 @@ const addEmployee = async () => {
     let rolesName = await helperEmployee();
 
     inquirer.prompt([
-
         {
             type: 'input',
             name: 'name',
@@ -402,6 +399,8 @@ const addEmployee = async () => {
     ])
         .then(answers => {
             //taking the value entry for the prompt
+
+
             let name = answers.name;
             let last = answers.lastName;
             let roleIdEmp = answers.selectRole;
@@ -515,7 +514,7 @@ const updateManager = async () => {
 
 
                 console.log("Employee's manager has been updated!");
-                console.log('\n')
+
 
                 //call the mainMenu for show a question again
                 mainMenu();
